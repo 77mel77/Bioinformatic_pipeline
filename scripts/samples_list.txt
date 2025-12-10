@@ -1,4 +1,0 @@
-/home/fc66436/Project_ibbc_Melanie_Herrera/raw_data/Arabidopsis_simulated.1.fq.gz /home/fc66436/Project_ibbc_Melanie_Herrera/raw_data/Arabidopsis_simulated.2.fq.gz
-/home/fc66436/Project_ibbc_Melanie_Herrera/raw_data/SRR5201683_1.fastq.gz /home/fc66436/Project_ibbc_Melanie_Herrera/raw_data/SRR5201683_2.fastq.gz
-/home/fc66436/Project_ibbc_Melanie_Herrera/raw_data/SRR5602600_1.fastq.gz /home/fc66436/Project_ibbc_Melanie_Herrera/raw_data/SRR5602600_2.fastq.gz
-/home/fc66436/Project_ibbc_Melanie_Herrera/raw_data/SRR5803928_1.fastq.gz /home/fc66436/Project_ibbc_Melanie_Herrera/raw_data/SRR5803928_2.fastq.gz

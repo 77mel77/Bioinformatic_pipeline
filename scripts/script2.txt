@@ -1,4 +1,0 @@
-/home/fc66436/Project_ibbc_Melanie_Herrera/results/Arabidopsis_R1.clean.fastq.gz /home/fc66436/Project_ibbc_Melanie_Herrera/results/Arabidopsis_R2.clean.fastq.gz
-/home/fc66436/Project_ibbc_Melanie_Herrera/results/SRR5201683_R1.clean.fastq.gz /home/fc66436/Project_ibbc_Melanie_Herrera/results/SRR5201683_R2.clean.fastq.gz
-/home/fc66436/Project_ibbc_Melanie_Herrera/results/SRR5602600_R1.clean.fastq.gz /home/fc66436/Project_ibbc_Melanie_Herrera/results/SRR5602600_R2.clean.fastq.gz
-/home/fc66436/Project_ibbc_Melanie_Herrera/results/SRR5803928_R1.clean.fastq.gz /home/fc66436/Project_ibbc_Melanie_Herrera/results/SRR5803928_R2.clean.fastq.gz

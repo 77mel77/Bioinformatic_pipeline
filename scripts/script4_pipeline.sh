@@ -81,7 +81,6 @@ while read -r R1 R2; do
       -k 21,45,65,85,105 \
       -F animal_mt \
       -t "$THREADS" \
-      -s ~/.GetOrganelle/SeedDatabase/SardinaMH329246.fasta \
       -o "$GETORGANELLE_OUTPUT_DIR" \
       $OVERWRITE_FLAG 2>&1 | tee -a "$LOGFILE"
 
