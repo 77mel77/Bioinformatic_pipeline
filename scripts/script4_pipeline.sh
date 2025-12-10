@@ -2,11 +2,16 @@
 # Pipeline de QC + trimming + organelle
 
 if [ -z "$1" ]; then
-    echo "Usage: $0 <project_directory>"
+    echo "Usage: $0 <project_directory> [--overwrite]"
     exit 1
 fi
 
 PROJECT_DIR=$1
+OVERWRITE_FLAG=""
+if [ "$2" == "--overwrite" ]; then
+    OVERWRITE_FLAG="--overwrite"
+fi
+
 SAMPLES_FILE="$PROJECT_DIR/raw_data/samples.txt"
 OUTDIR="$PROJECT_DIR/results"
 LOGFILE="$PROJECT_DIR/logs/pipeline.log"
@@ -25,6 +30,9 @@ mkdir -p "$OUTDIR/qc_raw" "$OUTDIR/fastp" "$OUTDIR/organelle" "$PROJECT_DIR/logs
 # --- Start logging ---
 echo "Pipeline started: $(date)" > "$LOGFILE"
 echo "Using $THREADS threads" >> "$LOGFILE"
+if [ ! -z "$OVERWRITE_FLAG" ]; then
+    echo "Overwrite flag is set. Existing getorganelle directories will be overwritten." >> "$LOGFILE"
+fi
 
 # --- Process each sample ---
 while read -r R1 R2; do
@@ -63,7 +71,7 @@ while read -r R1 R2; do
     # 3. Organelle assembly with getorganelle
     echo "Running getorganelle for $SAMPLE" >> "$LOGFILE"
     GETORGANELLE_OUTPUT_DIR="$OUTDIR/organelle/${SAMPLE}_organelle"
-    mkdir -p "$GETORGANELLE_OUTPUT_DIR"
+    # No need to mkdir -p here, getorganelle handles it
 
     # Using provided getorganelle parameters
     get_organelle_from_reads.py \
@@ -74,7 +82,8 @@ while read -r R1 R2; do
       -F animal_mt \
       -t "$THREADS" \
       -s ~/.GetOrganelle/SeedDatabase/SardinaMH329246.fasta \
-      -o "$GETORGANELLE_OUTPUT_DIR" 2>&1 | tee -a "$LOGFILE"
+      -o "$GETORGANELLE_OUTPUT_DIR" \
+      $OVERWRITE_FLAG 2>&1 | tee -a "$LOGFILE"
 
     # Basic check for getorganelle output
     if [ -d "$GETORGANELLE_OUTPUT_DIR" ] && [ "$(ls -A "$GETORGANELLE_OUTPUT_DIR")" ]; then
