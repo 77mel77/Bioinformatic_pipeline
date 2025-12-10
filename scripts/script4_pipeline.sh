@@ -11,7 +11,6 @@ SAMPLES_FILE="$PROJECT_DIR/raw_data/samples.txt"
 OUTDIR="$PROJECT_DIR/results"
 LOGFILE="$PROJECT_DIR/logs/pipeline.log"
 THREADS=8
-TRIM_PARAMS="--detect_adapter_for_pe -q 20 -l 50"
 
 # --- Check for dependencies ---
 if [ ! -f "$SAMPLES_FILE" ]; then
@@ -41,22 +40,41 @@ while read -r R1 R2; do
 
     # 2. Trimming with fastp
     echo "Running fastp for $SAMPLE" >> "$LOGFILE"
-    fastp -i "$R1_PATH" -I "$R2_PATH" \
-          -o "$OUTDIR/fastp/${SAMPLE}_R1.clean.fastq.gz" \
-          -O "$OUTDIR/fastp/${SAMPLE}_R2.clean.fastq.gz" \
-          -h "$OUTDIR/fastp/${SAMPLE}_fastp.html" \
-          -j "$OUTDIR/fastp/${SAMPLE}_fastp.json" \
-          "$TRIM_PARAMS" 2>&1 | tee -a "$LOGFILE"
+    INPUT_FILE_R1="$R1_PATH"
+    INPUT_FILE_R2="$R2_PATH"
+    OUT_FILE_R1="$OUTDIR/fastp/${SAMPLE}_R1.clean.fastq.gz"
+    OUT_FILE_R2="$OUTDIR/fastp/${SAMPLE}_R2.clean.fastq.gz"
+    REPORT_HTML="$OUTDIR/fastp/${SAMPLE}_fastp.html"
+    REPORT_JSON="$OUTDIR/fastp/${SAMPLE}_fastp.json"
+
+    fastp \
+      -i "$INPUT_FILE_R1" \
+      -I "$INPUT_FILE_R2" \
+      -o "$OUT_FILE_R1" \
+      -O "$OUT_FILE_R2" \
+      -q 30 \
+      -l 50 \
+      --cut_front \
+      --cut_tail \
+      --overrepresentation_analysis \
+      -h "$REPORT_HTML" \
+      -j "$REPORT_JSON" 2>&1 | tee -a "$LOGFILE"
 
     # 3. Organelle assembly with getorganelle
     echo "Running getorganelle for $SAMPLE" >> "$LOGFILE"
     GETORGANELLE_OUTPUT_DIR="$OUTDIR/organelle/${SAMPLE}_organelle"
     mkdir -p "$GETORGANELLE_OUTPUT_DIR"
 
-    # Using embplant_mt for demonstration. Consider making this configurable for real applications.
-    getorganelle -F embplant_mt -o "$GETORGANELLE_OUTPUT_DIR" \
-                  -R "$OUTDIR/fastp/${SAMPLE}_R1.clean.fastq.gz","$OUTDIR/fastp/${SAMPLE}_R2.clean.fastq.gz" \
-                  2>&1 | tee -a "$LOGFILE"
+    # Using provided getorganelle parameters
+    get_organelle_from_reads.py \
+      -1 "$OUTDIR/fastp/${SAMPLE}_R1.clean.fastq.gz" \
+      -2 "$OUTDIR/fastp/${SAMPLE}_R2.clean.fastq.gz" \
+      -R 10 \
+      -k 21,45,65,85,105 \
+      -F animal_mt \
+      -t "$THREADS" \
+      -s ~/.GetOrganelle/SeedDatabase/SardinaMH329246.fasta \
+      -o "$GETORGANELLE_OUTPUT_DIR" 2>&1 | tee -a "$LOGFILE"
 
     # Basic check for getorganelle output
     if [ -d "$GETORGANELLE_OUTPUT_DIR" ] && [ "$(ls -A "$GETORGANELLE_OUTPUT_DIR")" ]; then
@@ -68,3 +86,4 @@ while read -r R1 R2; do
     echo "Finished processing: $SAMPLE" | tee -a "$LOGFILE"
 done < "$SAMPLES_FILE"
 
+echo "Pipeline finished: $(date)" >> "$LOGFILE"
